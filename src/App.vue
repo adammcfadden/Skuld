@@ -2,7 +2,7 @@
   <v-app dark v-if="ready">
     <v-navigation-drawer persistent :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher>
       <v-list v-if="rooms">
-        <v-list-tile @click="(room) => toggleRoomSelected(room)" :style="{backgroundColor: room.backgroundColor}" value="true" v-for="(room, i) in rooms" :key="i">
+        <v-list-tile @click="toggleRoomSelected(room)" :style="{backgroundColor: room.backgroundColor, color: invertColor(room.backgroundColor)}" value="true" v-for="(room, i) in rooms" :key="i">
           <v-list-tile-action>
             <span>{{room.summary.substr(0,1)}}</span>
           </v-list-tile-action>
@@ -24,28 +24,20 @@
       <v-btn ref="authorizeButton" @click="handleAuthClick" id="authorize-button" dark v-else>Authorize</v-btn>
     </v-toolbar>
     <main>
-      <v-container fluid>
-        <v-slide-y-transition mode="out-in">
-          <v-layout column align-center>
-            <img src="/static/img/v.png" alt="Vuetify.js" class="mb-5">
-            <blockquote>
-              &#8220;First, solve the problem. Then, write the code.&#8221;
-              <footer>
-                <small>
-                  <em>&mdash;John Johnson</em>
-                </small>
-              </footer>
-            </blockquote>
-          </v-layout>
-        </v-slide-y-transition>
-
-        <pre id="content"></pre>
-      </v-container>
+      <v-slide-y-transition mode="out-in">
+        <schedules :schedules="schedules" :currentUnixTime="currentUnixTime"></schedules>
+      </v-slide-y-transition>
     </main>
   </v-app>
 </template>
 
 <script>
+import moment from 'moment';
+
+import Schedules from './components/Schedules';
+import invertColor from './colorInvert';
+import './main.css';
+
 
 // Client ID and API key from the Developer Console
 const CLIENT_ID = '1038995557573-cre796lpfvffqrcirdd9elka3evbapl8.apps.googleusercontent.com';
@@ -66,21 +58,21 @@ export default {
       fixed: false,
       miniVariant: false,
       title: 'Vuetify.js',
-      selectedRooms: [
-
-      ],
+      selectedRooms: [],
+      schedules: [],
       isSignedIn: false,
       gapiClient: undefined,
+      currentUnixTime: new Date().getTime(),
     };
   },
   asyncComputed: {
     rooms: {
       get() {
+        if (!this.isSignedIn) { return []; }
+
         return window.gapi.client.calendar.calendarList.list({
           'maxResults': 250,
         }).then(function(response) {
-          console.log(response);
-
           let _rooms = response.result.items.filter(item => {
             return item.id.includes('resource');
           })
@@ -93,7 +85,50 @@ export default {
       lazy: true,
     }
   },
+  components: {
+    Schedules
+  },
   methods: {
+    updateRoomSchedules() {
+      console.log('Updating rooms');
+      let newSchedules = [];
+      let updateCount = this.selectedRooms.length;
+
+      const start = new Date();
+      start.setHours(7, 0, 0, 0);
+      const end = new Date();
+      end.setHours(19, 0, 0, 0);
+      // const start = moment().subtract(2, 'hours')
+      // const end = moment().add(6, 'hours')
+
+      this.selectedRooms.forEach(room => {
+        window.gapi.client.calendar.events.list({
+          timeMin: start.toISOString(),
+          timeMax: end.toISOString(),
+          showDeleted: false,
+          singleEvents: true,
+          maxResults: 250,
+          orderBy: 'startTime',
+          calendarId: room.id
+        }).then((response) => {
+          const events = response.result.items
+
+          updateCount -= 1
+
+          newSchedules.push({
+            room: room,
+            schedule: events
+          })
+
+          if (updateCount === 0) {
+            // update the property
+            this.schedules = newSchedules;
+          }
+
+          this.currentUnixTime = new Date().getTime();
+        })
+      })
+    },
     toggleRoomSelected(room) {
       if (this.selectedRooms.includes(room)) {
         this.selectedRooms = this.selectedRooms.filter(r => {
@@ -101,6 +136,17 @@ export default {
         });
       } else {
         this.selectedRooms.push(room);
+      }
+
+      if (this.selectedRooms.length > 0) {
+        this.updateRoomSchedules();
+
+        if (this.roomUpdateInterval) { clearInterval(this.roomUpdateInterval); }
+
+        // Update rooms once a minute
+        this.roomUpdateInterval = setInterval(() => {
+          this.updateRoomSchedules();
+        }, 30000)
       }
     },
     handleClientLoad() {
@@ -138,12 +184,17 @@ export default {
         this.isSignedIn = false;
       }
     },
+    invertColor(color, bw = true) {
+      return invertColor(color, bw);
+    },
+
 
     /**
      *  Sign in the user upon button click.
      */
     handleAuthClick(event) {
       window.gapi.auth2.getAuthInstance().signIn();
+      this.$forceUpdate;
     },
 
     /**
@@ -151,6 +202,7 @@ export default {
      */
     handleSignoutClick(event) {
       window.gapi.auth2.getAuthInstance().signOut();
+      this.$forceUpdate;
     },
 
     /**
