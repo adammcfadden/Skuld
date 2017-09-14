@@ -19,6 +19,8 @@
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
+      <clock></clock>
+      <v-spacer></v-spacer>
       <!--Add buttons to initiate auth sequence and sign out-->
       <v-btn ref="signoutButton" @click="handleSignoutClick" id="signout-button" dark v-if="isSignedIn">Sign Out</v-btn>
       <v-btn ref="authorizeButton" @click="handleAuthClick" id="authorize-button" dark v-else>Authorize</v-btn>
@@ -35,6 +37,7 @@
 import moment from 'moment';
 
 import Schedules from './components/Schedules';
+import Clock from './components/Clock';
 import invertColor from './colorInvert';
 import './main.css';
 
@@ -95,7 +98,8 @@ export default {
     }
   },
   components: {
-    Schedules
+    Schedules,
+    Clock
   },
   methods: {
     loadSelectedRooms() {
@@ -105,7 +109,6 @@ export default {
       return JSON.parse(rooms);
     },
     updateRoomSchedules() {
-      console.log('Updating rooms');
       let newSchedules = [];
       let updateCount = this.selectedRooms.length;
 
@@ -209,6 +212,8 @@ export default {
         this.isSignedIn = false;
       }
     },
+
+
     invertColor(color, bw = true) {
       return invertColor(color, bw);
     },
@@ -231,31 +236,6 @@ export default {
       this.schedules = [];
       this.$forceUpdate();
     },
-
-    /**
-     * Append a pre element to the body containing the given message
-     * as its text node. Used to display the results of the API call.
-     *
-     * @param {string} message Text to be placed in pre element.
-     */
-    appendPre(message) {
-      let pre = document.getElementById('content');
-      let textContent = document.createTextNode(message + '\n');
-      pre.appendChild(textContent);
-    },
-
-    /**
-     * Print the summary and start datetime/date of the next ten events in
-     * the authorized user's calendar. If no events are found an
-     * appropriate message is printed.
-     */
-    listUpcomingEvents() {
-      window.gapi.client.calendar.calendarList.list({
-        'maxResults': 250,
-      }).then(function(response) {
-        console.log(response);
-      });
-    },
   },
   mounted() {
     this.handleClientLoad();
@@ -271,6 +251,9 @@ export default {
 
       this.loadFromCache = false;
     }
+  },
+  beforeDestroy() {
+    clearInterval(this.roomUpdateInterval);
   }
 };
 </script>

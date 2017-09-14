@@ -3,21 +3,21 @@
         <div class="current-time" :style="{top: currentTimeHeight()}"></div>
         <div v-for="(room, i) in schedules" :key="i" :style="{gridColumn: i + 1}" class="room">
             <div class="room-heading" :style="{
-            backgroundColor: room.room.backgroundColor,
-            color: invertColor(room.room.backgroundColor),
-        }">
+                backgroundColor: room.room.backgroundColor,
+                color: invertColor(room.room.backgroundColor),
+            }">
                 {{room.room.summary}}
             </div>
             <div class="room-availability" :style="{
-            backgroundColor: roomTaken(room) ? '#ff0000' : '#008000',
-            color: invertColor(roomTaken(room) ? '#ff0000' : '#008000'),
-        }">{{ roomTaken(room) ? 'Taken' : 'Free'}}</div>
+                backgroundColor: roomTaken(room) ? '#ff0000' : '#008000',
+                color: invertColor(roomTaken(room) ? '#ff0000' : '#008000'),
+            }">{{ roomTaken(room) ? 'Taken' : 'Free'}}</div>
             <div v-for="(event, eI) in room.schedule" :key="eI" class="event" :style="{
-            top: eventTop(event),
-            height: eventHeight(event),
-            backgroundColor: room.room.backgroundColor,
-            color: invertColor(room.room.backgroundColor)
-        }">
+                top: eventTop(event),
+                height: eventHeight(event),
+                backgroundColor: room.room.backgroundColor,
+                color: invertColor(room.room.backgroundColor)
+            }">
                 <p class="event-summary">{{ event.visibility === 'private' ? 'Private' : event.summary }}</p>
                 <div class="event-time">
                     <p>{{ moment(event.start.dateTime).calendar() }}</p>
