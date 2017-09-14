@@ -8,7 +8,7 @@
             }">
                 {{room.room.summary}}
             </div>
-            <div class="room-availability" :style="{fontSize: $vuetify.breakpoint.mdAndUp ? '1.5em' : '1em', height: $vuetify.breakpoint.mdAndUp ? '4em' : '3em' }">
+            <div class="room-availability" :style="{fontSize: $vuetify.breakpoint.mdAndUp ? '1.5em' : '1em'}">
                 <div class="room-status" :style="{
                     backgroundColor: roomTaken(room) ? '#ff0000' : '#008000',
                     color: invertColor(roomTaken(room) ? '#ff0000' : '#008000'),
