@@ -1,5 +1,6 @@
 <template>
     <div class="schedule-container" :style="{gridTemplateColumns: 'repeat(' + schedules.length + ', 1fr)', marginBottom: $vuetify.breakpoint.mdAndUp ? '4em' : '3em', height: $vuetify.breakpoint.mdAndUp ? 'calc(100vh - 64px - 6rem)' : 'calc(100vh - 36px - 6.4rem)'}">
+        <helper :room="helperRoom" :event="helperEvent" v-if="showHelper"></helper>
         <timeline></timeline>
         <div class="current-time" :style="{top: currentTimeHeight()}"></div>
         <div v-for="(room, i) in schedules" :key="i" :style="{gridColumn: i + 1}" class="room">
@@ -65,19 +66,21 @@
 import moment from 'moment';
 import invertColor from '../colorInvert';
 import Timeline from './Timeline';
+import Helper from './Helper';
 
 export default {
     data() {
         return {
-            // dayStart: this.moment().subtract(2, 'hours').valueOf(),
-            // dayEnd: this.moment().add(6, 'hours').valueOf(),
             dayStart: new Date().setHours(8, 0, 0, 0),
             dayEnd: new Date().setHours(18, 0, 0, 0),
-            eventsGroupTallie: {},
+            showHelper: false,
+            helperRoom: '',
+            helperEvent: ''
         }
     },
     components: {
-        Timeline
+        Timeline,
+        Helper
     },
     computed: {
         dayLength() {
@@ -142,8 +145,6 @@ export default {
                 let start = moment(event.start.dateTime);
                 let end = moment(event.end.dateTime);
 
-
-                // if (start.isSameOrAfter(otherStart) && start.isBefore(otherEnd))
                 if (start.isBetween(otherStart, otherEnd, null, '[)') || end.isBetween(otherStart, otherEnd, null, '(]')) {
                     group.push(otherEvent);
                 }
@@ -172,12 +173,44 @@ export default {
 
             return `${timeTopPercent}%`
         },
+        checkForEventsStarting() {
+            let upcomingEvents = [];
+            this.schedules.forEach(room => {
+                room.schedule.forEach(event => {
+                    if(moment(event.start.dateTime).isBetween(moment(), moment().add(10, 'minutes'))){
+                        upcomingEvents.push(event);
+                    }
+                })
+            })
+
+            if(upcomingEvents.length > 0) {
+                upcomingEvents.forEach((event, index) => {
+                    setTimeout(() => {
+                        this.setHelperEvent(event.location, event.summary)
+                        this.showHelper = true;
+                    }, index * 15000)
+                })
+                setTimeout(() => {
+                    this.showHelper = false;
+                }, upcomingEvents.length * 15000)
+
+                console.log(upcomingEvents)
+            }
+        },
+        setHelperEvent(room, event) {
+            this.helperEvent = event;
+            this.helperRoom = room;
+        }
     },
     mounted() {
         // Updates every 5 seconds to move time sensitive items
         setInterval(() => {
             this.$forceUpdate();
         }, 5000)
+
+        setInterval(() => {
+            this.checkForEventsStarting();
+        }, 600000);
     }
 };
 </script>
@@ -199,8 +232,6 @@ export default {
     font-size: 1em;
     background: #424242;
     margin: 0 8px;
-    /* border-right: 8px solid #424242;
-    border-left: 8px solid #424242; */
 }
 
 .room-heading {
@@ -211,12 +242,7 @@ export default {
     font-size: 1.75em;
     text-align: center;
     top: -2rem;
-    /* border-left: 1px solid #303030;
-    border-right: 1px solid #303030; */
     z-index: 2000;
-    /* margin: 0 -8px;
-    border-right: 8px solid #424242;
-    border-left: 8px solid #424242; */
 }
 
 .room-availability {
@@ -261,8 +287,6 @@ export default {
     border: 1px solid #303030;
     overflow: hidden;
     line-height: 1;
-    /* justify-content: center; */
-    /* align-items: center; */
 }
 
 .event p {
