@@ -14,21 +14,21 @@
                     color: invertColor(roomTaken(room) ? '#ff0000' : '#008000'),
                 }">
                     <div>Now</div>
-                    <div>{{ roomTaken(room) ? 'Taken' : 'Free'}}</div>
+                    <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room) ? 'Taken' : 'Free'}}</div>
                 </div>
                 <div class="room-status" :style="{
                     backgroundColor: roomTaken(room, 30) ? '#ff0000' : '#008000',
                     color: invertColor(roomTaken(room, 30) ? '#ff0000' : '#008000'),
                 }">
                     <div>30 Min</div>
-                    <div>{{ roomTaken(room, 30) ? 'Taken' : 'Free'}}</div>
+                    <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 30) ? 'Taken' : 'Free'}}</div>
                 </div>
                 <div class="room-status" :style="{
                     backgroundColor: roomTaken(room, 60) ? '#ff0000' : '#008000',
                     color: invertColor(roomTaken(room, 60) ? '#ff0000' : '#008000'),
                 }">
                     <div>1 hr</div>
-                    <div>{{ roomTaken(room, 180) ? 'Taken' : 'Free'}}</div>
+                    <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 60) ? 'Taken' : 'Free'}}</div>
                 </div>
 
             </div>
@@ -121,7 +121,6 @@ export default {
             return count;
         },
         eventWidth(event, events) {
-            console.log(this.eventsDuringGivenEvent(event, events))
             return `${100 / this.eventsDuringGivenEvent(event, events)}%`;
         },
         eventLeft(event, events) {
@@ -147,8 +146,6 @@ export default {
             })
 
             index += 1;
-
-            console.log(index, events, group.length, group, `${(100 / group.length) * index}%`)
 
             return `${100 - ((100 / group.length) * index)}%`;
         },
@@ -221,6 +218,9 @@ export default {
     width: 100%;
     border-left: 1px solid #303030;
     border-right: 1px solid #303030;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .room-status div {
