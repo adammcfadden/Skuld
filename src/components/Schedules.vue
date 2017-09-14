@@ -11,22 +11,22 @@
             </div>
             <div class="room-availability" :style="{fontSize: $vuetify.breakpoint.mdAndUp ? '1.5em' : '1em', height: $vuetify.breakpoint.mdAndUp ? '4rem' : '3em'}">
                 <div class="room-status" :style="{
-                    backgroundColor: roomTaken(room) ? '#b9c1bd' : '#57c2b2',
-                    color: invertColor(roomTaken(room) ? '#b9c1bd' : '#57c2b2'),
+                    backgroundColor: roomTaken(room) ? '#b9c1bd' : room.room.backgroundColor,
+                    color: invertColor(roomTaken(room) ? '#b9c1bd' : room.room.backgroundColor),
                 }">
                     <div>Now</div>
                     <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room) ? 'Taken' : 'Available'}}</div>
                 </div>
                 <div class="room-status" :style="{
-                    backgroundColor: roomTaken(room, 30) ? '#b9c1bd' : '#57c2b2',
-                    color: invertColor(roomTaken(room, 30) ? '#b9c1bd' : '#57c2b2'),
+                    backgroundColor: roomTaken(room, 30) ? '#b9c1bd' : room.room.backgroundColor,
+                    color: invertColor(roomTaken(room, 30) ? '#b9c1bd' : room.room.backgroundColor),
                 }">
                     <div>30 Min</div>
                     <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 30) ? 'Taken' : 'Available'}}</div>
                 </div>
                 <div class="room-status" :style="{
-                    backgroundColor: roomTaken(room, 60) ? '#b9c1bd' : '#57c2b2',
-                    color: invertColor(roomTaken(room, 60) ? '#b9c1bd' : '#57c2b2'),
+                    backgroundColor: roomTaken(room, 60) ? '#b9c1bd' : room.room.backgroundColor,
+                    color: invertColor(roomTaken(room, 60) ? '#b9c1bd' : room.room.backgroundColor),
                 }">
                     <div>1 hr</div>
                     <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 60) ? 'Taken' : 'Available'}}</div>
