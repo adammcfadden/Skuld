@@ -99,7 +99,7 @@ export default {
   },
   components: {
     Schedules,
-    Clock
+    Clock,
   },
   methods: {
     loadSelectedRooms() {

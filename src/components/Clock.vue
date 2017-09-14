@@ -10,7 +10,7 @@ import moment from 'moment';
 export default {
     data() {
         return {
-            clock: moment().format("MMMM Do - hh:mm:ss"),
+            clock: moment().format("MMMM Do - h:mm:ss"),
         };
     },
     methods: {

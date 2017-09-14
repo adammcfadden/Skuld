@@ -1,5 +1,6 @@
 <template>
     <div class="schedule-container" :style="{gridTemplateColumns: 'repeat(' + schedules.length + ', 1fr)', marginBottom: $vuetify.breakpoint.mdAndUp ? '4em' : '3em', height: $vuetify.breakpoint.mdAndUp ? 'calc(100vh - 64px - 6rem)' : 'calc(100vh - 36px - 6rem)'}">
+        <timeline></timeline>
         <div class="current-time" :style="{top: currentTimeHeight()}"></div>
         <div v-for="(room, i) in schedules" :key="i" :style="{gridColumn: i + 1}" class="room">
             <div class="room-heading" :style="{
@@ -10,22 +11,22 @@
             </div>
             <div class="room-availability" :style="{fontSize: $vuetify.breakpoint.mdAndUp ? '1.5em' : '1em'}">
                 <div class="room-status" :style="{
-                    backgroundColor: roomTaken(room) ? '#ff0000' : '#008000',
-                    color: invertColor(roomTaken(room) ? '#ff0000' : '#008000'),
+                    backgroundColor: roomTaken(room) ? '#b9c1bd' : '#57c2b2',
+                    color: invertColor(roomTaken(room) ? '#b9c1bd' : '#57c2b2'),
                 }">
                     <div>Now</div>
                     <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room) ? 'Taken' : 'Free'}}</div>
                 </div>
                 <div class="room-status" :style="{
-                    backgroundColor: roomTaken(room, 30) ? '#ff0000' : '#008000',
-                    color: invertColor(roomTaken(room, 30) ? '#ff0000' : '#008000'),
+                    backgroundColor: roomTaken(room, 30) ? '#b9c1bd' : '#57c2b2',
+                    color: invertColor(roomTaken(room, 30) ? '#b9c1bd' : '#57c2b2'),
                 }">
                     <div>30 Min</div>
                     <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 30) ? 'Taken' : 'Free'}}</div>
                 </div>
                 <div class="room-status" :style="{
-                    backgroundColor: roomTaken(room, 60) ? '#ff0000' : '#008000',
-                    color: invertColor(roomTaken(room, 60) ? '#ff0000' : '#008000'),
+                    backgroundColor: roomTaken(room, 60) ? '#b9c1bd' : '#57c2b2',
+                    color: invertColor(roomTaken(room, 60) ? '#b9c1bd' : '#57c2b2'),
                 }">
                     <div>1 hr</div>
                     <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 60) ? 'Taken' : 'Free'}}</div>
@@ -37,21 +38,24 @@
                 height: eventHeight(event),
                 backgroundColor: room.room.backgroundColor,
                 color: invertColor(room.room.backgroundColor),
-                opacity: eventRunning(event) ? 1 : 0.6,
+                opacity: eventRunning(event) ? 1 : 0.85,
+                border: eventRunning(event) ? `2px solid #57c2b2` : null,
                 width: eventWidth(event, room.schedule),
                 left: eventLeft(event, room.schedule),
                 flexDirection: $vuetify.breakpoint.mdAndUp ? null : 'row',
                 justifyContent: $vuetify.breakpoint.mdAndUp ? null : 'space-between'
             }">
                 <p class="event-summary">{{ event.visibility === 'private' ? 'Private' : event.summary }}</p>
-                <div class="event-time" v-if="$vuetify.breakpoint.mdAndUp"> 
-                    <p>{{ moment(event.start.dateTime).calendar() }}</p>
-                    <p> - </p>
-                    <p>{{ moment(event.end.dateTime).calendar() }}</p>
+                <div class="event-time" :style="{
+                    justifyContent: $vuetify.breakpoint.mdAndUp ? null : 'flex-end'
+                }">
+                    {{ moment(event.start.dateTime).format('h:mm') }}
+                     -
+                    {{ moment(event.end.dateTime).format('h:mm') }}
                 </div>
-                <p class="event-duration" v-else>
+                <p class="event-duration" v-if="$vuetify.breakpoint.mdAndUp">
                     {{ eventDuration(event) }}
-                </p>                
+                </p>
             </div>
         </div>
     </div>
@@ -60,6 +64,7 @@
 <script>
 import moment from 'moment';
 import invertColor from '../colorInvert';
+import Timeline from './Timeline';
 
 export default {
     data() {
@@ -70,6 +75,9 @@ export default {
             dayEnd: new Date().setHours(18, 0, 0, 0),
             eventsGroupTallie: {},
         }
+    },
+    components: {
+        Timeline
     },
     computed: {
         dayLength() {
@@ -184,11 +192,16 @@ export default {
     margin-top: 2rem;
     margin-bottom: 4rem;
     position: relative;
+    margin-left: 48px;
 }
 
 .room {
     position: relative;
-    font-size: 0.9em;
+    font-size: 1em;
+    background: #424242;
+    margin: 0 8px;
+    /* border-right: 8px solid #424242;
+    border-left: 8px solid #424242; */
 }
 
 .room-heading {
@@ -199,9 +212,12 @@ export default {
     font-size: 1.75em;
     text-align: center;
     top: -2rem;
-    border-left: 1px solid #303030;
-    border-right: 1px solid #303030;
+    /* border-left: 1px solid #303030;
+    border-right: 1px solid #303030; */
     z-index: 2000;
+    /* margin: 0 -8px;
+    border-right: 8px solid #424242;
+    border-left: 8px solid #424242; */
 }
 
 .room-availability {
@@ -212,6 +228,9 @@ export default {
     text-align: center;
     top: 100%;
     display: flex;
+    /* margin: 0 8px;
+    border-right: 8px solid #424242;
+    border-left: 8px solid #424242; */
 }
 
 .room-status {
@@ -240,11 +259,12 @@ export default {
     position: absolute;
     width: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     box-sizing: border-box;
     padding: 0.25em;
     border: 1px solid #303030;
     overflow: hidden;
+    line-height: 1;
     /* justify-content: center; */
     /* align-items: center; */
 }
@@ -255,7 +275,7 @@ export default {
 
 .event-summary {
     font-weight: bold;
-    width: 100%;    
+    width: 100%;
 }
 
 .event-duration {
@@ -266,5 +286,6 @@ export default {
 .event-time {
     display: flex;
     width: 100%;
+    justify-content: center;
 }
 </style>
