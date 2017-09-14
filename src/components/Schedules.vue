@@ -206,7 +206,7 @@ export default {
 
 .room-availability {
     position: absolute;
-    height: 4rem;
+    height: 3em;
     width: 100%;
     font-size: 1.5em;
     text-align: center;
