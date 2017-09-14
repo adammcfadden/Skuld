@@ -18,6 +18,9 @@
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
+      <div style="font-size: 1.5em">
+        {{ date }}
+      </div>
       <v-spacer></v-spacer>
       <clock class="hidden-sm-and-down"></clock>
       <v-spacer></v-spacer>
@@ -62,6 +65,7 @@ export default {
       drawer: true,
       fixed: false,
       miniVariant: false,
+      date: moment().format("MMMM Do YYYY"),
       title: '',
       selectedRooms: this.loadSelectedRooms(),
       schedules: [],

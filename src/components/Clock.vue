@@ -10,7 +10,7 @@ import moment from 'moment';
 export default {
     data() {
         return {
-            clock: moment().format("MMMM Do - h:mm:ss"),
+            clock: moment().format(" h:mm:ss"),
         };
     },
     methods: {
@@ -18,7 +18,7 @@ export default {
             return moment(args);
         },
         setTime() {
-            this.clock = moment().format("MMMM Do - hh:mm:ss");
+            this.clock = moment().format("h:mm:ss");
         },
     },
     mounted() {
@@ -34,6 +34,6 @@ export default {
 
 <style>
 .clock {
-    font-size: 1.5em;
+    font-size: 2.5em;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="schedule-container" :style="{gridTemplateColumns: 'repeat(' + schedules.length + ', 1fr)', marginBottom: $vuetify.breakpoint.mdAndUp ? '4em' : '3em', height: $vuetify.breakpoint.mdAndUp ? 'calc(100vh - 64px - 6rem)' : 'calc(100vh - 36px - 6rem)'}">
+    <div class="schedule-container" :style="{gridTemplateColumns: 'repeat(' + schedules.length + ', 1fr)', marginBottom: $vuetify.breakpoint.mdAndUp ? '4em' : '3em', height: $vuetify.breakpoint.mdAndUp ? 'calc(100vh - 64px - 6rem)' : 'calc(100vh - 36px - 6.4rem)'}">
         <timeline></timeline>
         <div class="current-time" :style="{top: currentTimeHeight()}"></div>
         <div v-for="(room, i) in schedules" :key="i" :style="{gridColumn: i + 1}" class="room">
@@ -9,27 +9,27 @@
             }">
                 {{room.room.summary}}
             </div>
-            <div class="room-availability" :style="{fontSize: $vuetify.breakpoint.mdAndUp ? '1.5em' : '1em'}">
+            <div class="room-availability" :style="{fontSize: $vuetify.breakpoint.mdAndUp ? '1.5em' : '1em', height: $vuetify.breakpoint.mdAndUp ? '4rem' : '3em'}">
                 <div class="room-status" :style="{
                     backgroundColor: roomTaken(room) ? '#b9c1bd' : '#57c2b2',
                     color: invertColor(roomTaken(room) ? '#b9c1bd' : '#57c2b2'),
                 }">
                     <div>Now</div>
-                    <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room) ? 'Taken' : 'Free'}}</div>
+                    <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room) ? 'Taken' : 'Available'}}</div>
                 </div>
                 <div class="room-status" :style="{
                     backgroundColor: roomTaken(room, 30) ? '#b9c1bd' : '#57c2b2',
                     color: invertColor(roomTaken(room, 30) ? '#b9c1bd' : '#57c2b2'),
                 }">
                     <div>30 Min</div>
-                    <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 30) ? 'Taken' : 'Free'}}</div>
+                    <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 30) ? 'Taken' : 'Available'}}</div>
                 </div>
                 <div class="room-status" :style="{
                     backgroundColor: roomTaken(room, 60) ? '#b9c1bd' : '#57c2b2',
                     color: invertColor(roomTaken(room, 60) ? '#b9c1bd' : '#57c2b2'),
                 }">
                     <div>1 hr</div>
-                    <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 60) ? 'Taken' : 'Free'}}</div>
+                    <div v-if="$vuetify.breakpoint.mdAndUp">{{ roomTaken(room, 60) ? 'Taken' : 'Available'}}</div>
                 </div>
 
             </div>
@@ -185,7 +185,6 @@ export default {
 <style>
 .schedule-container {
     height: calc(100vh - 64px - 6rem);
-    width: 100%;
     box-sizing: border-box;
     padding: 3px;
     display: grid;
@@ -222,21 +221,17 @@ export default {
 
 .room-availability {
     position: absolute;
-    height: 3em;
+    height: 4rem;
     width: 100%;
     font-size: 1.5em;
     text-align: center;
     top: 100%;
     display: flex;
-    /* margin: 0 8px;
-    border-right: 8px solid #424242;
-    border-left: 8px solid #424242; */
+    justify-content: space-between;
 }
 
 .room-status {
-    width: 100%;
-    border-left: 1px solid #303030;
-    border-right: 1px solid #303030;
+    width: calc(100%/3 - 2px);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -249,7 +244,8 @@ export default {
 
 .current-time {
     height: 1px;
-    width: 100%;
+    width: calc(100% + 48px);
+    left: -48px;
     position: absolute;
     z-index: 1000;
     border: 1px dashed #57c2b2;

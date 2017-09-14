@@ -25,3 +25,7 @@
   z-index: 3000 !important;
   margin-top: 56px !important;
 }
+
+::-webkit-scrollbar {
+  display: none;
+}
