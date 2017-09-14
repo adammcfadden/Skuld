@@ -1,6 +1,6 @@
 <template>
     <div class="schedule-container" :style="{gridTemplateColumns: 'repeat(' + schedules.length + ', 1fr)'}">
-        <div class="current-time" :style="{top: currentTimeHeight()}"></div>
+        <div class="current-time" :style="{top: `calc(${currentTimeHeight()} + 6rem)`}"></div>
         <div v-for="(room, i) in schedules" :key="i" :style="{gridColumn: i + 1}" class="room">
             <div class="room-heading" :style="{
                 backgroundColor: room.room.backgroundColor,
