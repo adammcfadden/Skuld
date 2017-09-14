@@ -49,6 +49,8 @@ const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v
 // included, separated by spaces.
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
+const UPDATE_INTERVAL = 30000;
+
 export default {
   data() {
     return {
@@ -57,12 +59,13 @@ export default {
       drawer: true,
       fixed: false,
       miniVariant: false,
-      title: 'Vuetify.js',
-      selectedRooms: [],
+      title: '',
+      selectedRooms: this.loadSelectedRooms(),
       schedules: [],
       isSignedIn: false,
       gapiClient: undefined,
       currentUnixTime: new Date().getTime(),
+      loadFromCache: true,
     };
   },
   asyncComputed: {
@@ -77,6 +80,12 @@ export default {
             return item.id.includes('resource');
           })
 
+          _rooms.sort((a, b) => {
+            if (a.summary < b.summary) return -1;
+            if (a.summary > b.summary) return 1;
+            return 0;
+          })
+
           return _rooms;
         });
 
@@ -89,6 +98,12 @@ export default {
     Schedules
   },
   methods: {
+    loadSelectedRooms() {
+      let rooms = localStorage.getItem('selected-rooms')
+      if (!rooms) { return [] };
+
+      return JSON.parse(rooms);
+    },
     updateRoomSchedules() {
       console.log('Updating rooms');
       let newSchedules = [];
@@ -121,8 +136,15 @@ export default {
           })
 
           if (updateCount === 0) {
+
+            newSchedules.sort((a, b) => {
+              if (a.room.summary < b.room.summary) return -1;
+              if (a.room.summary > b.room.summary) return 1;
+              return 0;
+            })
+
             // update the property
-            this.schedules = newSchedules;
+            this.schedules = Array.from(newSchedules);
           }
 
           this.currentUnixTime = new Date().getTime();
@@ -130,13 +152,16 @@ export default {
       })
     },
     toggleRoomSelected(room) {
-      if (this.selectedRooms.includes(room)) {
-        this.selectedRooms = this.selectedRooms.filter(r => {
-          return r !== room
-        });
-      } else {
+      if (this.selectedRooms.findIndex(r => r.summary === room.summary) === -1) {
         this.selectedRooms.push(room);
+      } else {
+        this.selectedRooms = this.selectedRooms.filter(r => {
+          return r.summary !== room.summary
+        });
       }
+
+      // Cache selected Rooms
+      localStorage.setItem('selected-rooms', JSON.stringify(this.selectedRooms));
 
       if (this.selectedRooms.length > 0) {
         this.updateRoomSchedules();
@@ -146,7 +171,7 @@ export default {
         // Update rooms once a minute
         this.roomUpdateInterval = setInterval(() => {
           this.updateRoomSchedules();
-        }, 30000)
+        }, UPDATE_INTERVAL)
       }
     },
     handleClientLoad() {
@@ -194,7 +219,7 @@ export default {
      */
     handleAuthClick(event) {
       window.gapi.auth2.getAuthInstance().signIn();
-      this.$forceUpdate;
+      this.$forceUpdate();
     },
 
     /**
@@ -202,7 +227,9 @@ export default {
      */
     handleSignoutClick(event) {
       window.gapi.auth2.getAuthInstance().signOut();
-      this.$forceUpdate;
+      localStorage.removeItem('selected-rooms');
+      this.schedules = [];
+      this.$forceUpdate();
     },
 
     /**
@@ -235,6 +262,15 @@ export default {
   },
   updated() {
     this.handleClientLoad();
+    if (this.selectedRooms.length > 0 && this.loadFromCache) {
+      this.updateRoomSchedules()
+
+      this.roomUpdateInterval = setInterval(() => {
+        this.updateRoomSchedules();
+      }, UPDATE_INTERVAL)
+
+      this.loadFromCache = false;
+    }
   }
 };
 </script>
