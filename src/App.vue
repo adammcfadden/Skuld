@@ -19,7 +19,7 @@
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <clock></clock>
+      <clock class="hidden-sm-and-down"></clock>
       <v-spacer></v-spacer>
       <!--Add buttons to initiate auth sequence and sign out-->
       <v-btn ref="signoutButton" @click="handleSignoutClick" id="signout-button" dark v-if="isSignedIn">Sign Out</v-btn>

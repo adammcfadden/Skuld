@@ -1,5 +1,5 @@
 <template>
-    <div class="schedule-container" :style="{gridTemplateColumns: 'repeat(' + schedules.length + ', 1fr)'}">
+    <div class="schedule-container" :style="{gridTemplateColumns: 'repeat(' + schedules.length + ', 1fr)', marginBottom: $vuetify.breakpoint.mdAndUp ? '4em' : '3em', height: $vuetify.breakpoint.mdAndUp ? 'calc(100vh - 64px - 6rem)' : 'calc(100vh - 36px - 6rem)'}">
         <div class="current-time" :style="{top: currentTimeHeight()}"></div>
         <div v-for="(room, i) in schedules" :key="i" :style="{gridColumn: i + 1}" class="room">
             <div class="room-heading" :style="{
@@ -8,7 +8,7 @@
             }">
                 {{room.room.summary}}
             </div>
-            <div class="room-availability">
+            <div class="room-availability" :style="{fontSize: $vuetify.breakpoint.mdAndUp ? '1.5em' : '1em', height: $vuetify.breakpoint.mdAndUp ? '4em' : '3em' }">
                 <div class="room-status" :style="{
                     backgroundColor: roomTaken(room) ? '#ff0000' : '#008000',
                     color: invertColor(roomTaken(room) ? '#ff0000' : '#008000'),
@@ -39,14 +39,19 @@
                 color: invertColor(room.room.backgroundColor),
                 opacity: eventRunning(event) ? 1 : 0.6,
                 width: eventWidth(event, room.schedule),
-                left: eventLeft(event, room.schedule)
+                left: eventLeft(event, room.schedule),
+                flexDirection: $vuetify.breakpoint.mdAndUp ? null : 'row',
+                justifyContent: $vuetify.breakpoint.mdAndUp ? null : 'space-between'
             }">
                 <p class="event-summary">{{ event.visibility === 'private' ? 'Private' : event.summary }}</p>
-                <div class="event-time">
+                <div class="event-time" v-if="$vuetify.breakpoint.mdAndUp"> 
                     <p>{{ moment(event.start.dateTime).calendar() }}</p>
                     <p> - </p>
                     <p>{{ moment(event.end.dateTime).calendar() }}</p>
                 </div>
+                <p class="event-duration" v-else>
+                    {{ eventDuration(event) }}
+                </p>                
             </div>
         </div>
     </div>
@@ -78,6 +83,9 @@ export default {
     methods: {
         moment(args) {
             return moment(args);
+        },
+        eventDuration(event) {
+            return moment.duration(moment(event.end.dateTime).diff(moment(event.start.dateTime))).humanize()
         },
         eventTop(event) {
             const eventStart = new Date(event.start.dateTime).getTime();
@@ -236,6 +244,7 @@ export default {
     box-sizing: border-box;
     padding: 0.25em;
     border: 1px solid #303030;
+    overflow: hidden;
     /* justify-content: center; */
     /* align-items: center; */
 }
@@ -246,6 +255,12 @@ export default {
 
 .event-summary {
     font-weight: bold;
+    width: 100%;    
+}
+
+.event-duration {
+    width: 100%;
+    text-align: right;
 }
 
 .event-time {

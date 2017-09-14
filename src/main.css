@@ -20,3 +20,8 @@
 .toolbar--fixed {
   z-index: 2000 !important;
 }
+
+.navigation-drawer--is-mobile {
+  z-index: 3000 !important;
+  margin-top: 56px !important;
+}
