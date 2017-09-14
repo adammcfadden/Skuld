@@ -16,3 +16,7 @@
   background-position: center;
   text-overflow: ellipsis;
 }
+
+.toolbar--fixed {
+  z-index: 2000 !important;
+}

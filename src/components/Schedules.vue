@@ -8,15 +8,38 @@
             }">
                 {{room.room.summary}}
             </div>
-            <div class="room-availability" :style="{
-                backgroundColor: roomTaken(room) ? '#ff0000' : '#008000',
-                color: invertColor(roomTaken(room) ? '#ff0000' : '#008000'),
-            }">{{ roomTaken(room) ? 'Taken' : 'Free'}}</div>
+            <div class="room-availability">
+                <div class="room-status" :style="{
+                    backgroundColor: roomTaken(room) ? '#ff0000' : '#008000',
+                    color: invertColor(roomTaken(room) ? '#ff0000' : '#008000'),
+                }">
+                    <div>Now</div>
+                    <div>{{ roomTaken(room) ? 'Taken' : 'Free'}}</div>
+                </div>
+                <div class="room-status" :style="{
+                    backgroundColor: roomTaken(room, 30) ? '#ff0000' : '#008000',
+                    color: invertColor(roomTaken(room, 30) ? '#ff0000' : '#008000'),
+                }">
+                    <div>30 Min</div>
+                    <div>{{ roomTaken(room, 30) ? 'Taken' : 'Free'}}</div>
+                </div>
+                <div class="room-status" :style="{
+                    backgroundColor: roomTaken(room, 60) ? '#ff0000' : '#008000',
+                    color: invertColor(roomTaken(room, 60) ? '#ff0000' : '#008000'),
+                }">
+                    <div>1 hr</div>
+                    <div>{{ roomTaken(room, 180) ? 'Taken' : 'Free'}}</div>
+                </div>
+
+            </div>
             <div v-for="(event, eI) in room.schedule" :key="eI" class="event" :style="{
                 top: eventTop(event),
                 height: eventHeight(event),
                 backgroundColor: room.room.backgroundColor,
-                color: invertColor(room.room.backgroundColor)
+                color: invertColor(room.room.backgroundColor),
+                opacity: eventRunning(event) ? 1 : 0.6,
+                width: eventWidth(event, room.schedule),
+                left: eventLeft(event, room.schedule)
             }">
                 <p class="event-summary">{{ event.visibility === 'private' ? 'Private' : event.summary }}</p>
                 <div class="event-time">
@@ -40,6 +63,7 @@ export default {
             // dayEnd: this.moment().add(6, 'hours').valueOf(),
             dayStart: new Date().setHours(8, 0, 0, 0),
             dayEnd: new Date().setHours(18, 0, 0, 0),
+            eventsGroupTallie: {},
         }
     },
     computed: {
@@ -69,21 +93,72 @@ export default {
 
             return `${eventHeightPercent}%`
         },
+        eventRunning(event) {
+            let start = moment(event.start.dateTime);
+            let end = moment(event.end.dateTime);
+            return moment().isBetween(start, end);
+        },
+        eventsDuringGivenEvent(event, events) {
+            let count = 0;
+            events.forEach(otherEvent => {
+                let otherStart = moment(otherEvent.start.dateTime);
+                let otherEnd = moment(otherEvent.end.dateTime);
+                let start = moment(event.start.dateTime);
+                let end = moment(event.end.dateTime);
+
+                if (start.isBetween(otherStart, otherEnd, null, '[)') || end.isBetween(otherStart, otherEnd, null, '(]')) {
+                    count += 1;
+                }
+            })
+            return count;
+        },
+        eventWidth(event, events) {
+            console.log(this.eventsDuringGivenEvent(event, events))
+            return `${100 / this.eventsDuringGivenEvent(event, events)}%`;
+        },
+        eventLeft(event, events) {
+            let concurrent = this.eventsDuringGivenEvent(event, events);
+
+            const group = [];
+
+            events.forEach((otherEvent, otherEventIndex) => {
+                let otherStart = moment(otherEvent.start.dateTime);
+                let otherEnd = moment(otherEvent.end.dateTime);
+                let start = moment(event.start.dateTime);
+                let end = moment(event.end.dateTime);
+
+
+                // if (start.isSameOrAfter(otherStart) && start.isBefore(otherEnd))
+                if (start.isBetween(otherStart, otherEnd, null, '[)') || end.isBetween(otherStart, otherEnd, null, '(]')) {
+                    group.push(otherEvent);
+                }
+            })
+
+            let index = group.findIndex(e => {
+                return e === event;
+            })
+
+            index += 1;
+
+            console.log(index, events, group.length, group, `${(100 / group.length) * index}%`)
+
+            return `${100 - ((100 / group.length) * index)}%`;
+        },
         invertColor(color, bw = true) {
             return invertColor(color, bw);
         },
-        roomTaken(room) {
+        roomTaken(room, offset = 0) {
             return room.schedule.find(event => {
                 let start = moment(event.start.dateTime);
                 let end = moment(event.end.dateTime);
-                return moment().isBetween(start, end);
+                return moment().add(offset, 'minutes').isBetween(start, end);
             })
         },
         currentTimeHeight() {
             const timeTopPercent = ((new Date().getTime() - this.dayStart) / this.dayLength) * 100;
 
             return `${timeTopPercent}%`
-        }
+        },
     },
     mounted() {
         // Updates every 5 seconds to move time sensitive items
@@ -96,13 +171,13 @@ export default {
 
 <style>
 .schedule-container {
-    height: calc(100vh - 64px - 4rem);
+    height: calc(100vh - 64px - 6rem);
     width: 100%;
     box-sizing: border-box;
     padding: 3px;
     display: grid;
     margin-top: 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 4rem;
 }
 
 .room {
@@ -115,21 +190,33 @@ export default {
     top: 0;
     line-height: 2rem;
     width: 100%;
-    font-size: 2em;
+    font-size: 1.75em;
     text-align: center;
     top: -2rem;
-    border: 1px solid #303030;
+    border-left: 1px solid #303030;
+    border-right: 1px solid #303030;
+    z-index: 2000;
 }
 
 .room-availability {
     position: absolute;
-    /* top: 0; */
-    line-height: 2rem;
+    height: 4rem;
     width: 100%;
-    font-size: 2em;
+    font-size: 1.5em;
     text-align: center;
-    bottom: -2rem;
-    border: 1px solid #303030;
+    top: 100%;
+    display: flex;
+}
+
+.room-status {
+    width: 100%;
+    border-left: 1px solid #303030;
+    border-right: 1px solid #303030;
+}
+
+.room-status div {
+    display: flex;
+    flex-direction: column;
 }
 
 .current-time {
@@ -137,8 +224,7 @@ export default {
     width: 100%;
     position: absolute;
     z-index: 1000;
-    border: 3px dashed white;
-    opacity: 0.75;
+    border: 1px dashed #57c2b2;
 }
 
 .event {

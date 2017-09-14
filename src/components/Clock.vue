@@ -34,6 +34,6 @@ export default {
 
 <style>
 .clock {
-    font-size: 2em;
+    font-size: 1.5em;
 }
 </style>
