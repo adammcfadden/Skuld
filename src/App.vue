@@ -18,7 +18,7 @@
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
-      <div style="font-size: 1.5em">
+      <div class="hidden-sm-and-down" style="font-size: 1.5em">
         {{ date }}
       </div>
       <v-spacer></v-spacer>

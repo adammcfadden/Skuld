@@ -208,9 +208,17 @@ export default {
             this.$forceUpdate();
         }, 5000)
 
-        setInterval(() => {
-            this.checkForEventsStarting();
-        }, 600000);
+        // Start checking for notification updates every 10 minutes. 
+        // First do this 1 min after then next :10 min mark
+        let currentMin = this.moment().minute();
+        let offset = 10 * Math.round(currentMin / 10);
+        let roundedMoment = this.moment().add(offset - currentMin, 'minutes');
+        setTimeout(() => {
+            console.log('checking')
+            setInterval(() => {
+                this.checkForEventsStarting();
+            }, 600000);
+        }, roundedMoment.diff(moment().subtract(1, 'minute')))
     }
 };
 </script>
