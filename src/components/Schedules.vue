@@ -208,7 +208,7 @@ export default {
             this.$forceUpdate();
         }, 5000)
 
-        // Start checking for notification updates every 10 minutes. 
+        // Start checking for notification updates every 10 minutes.
         // First do this 1 min after then next :10 min mark
         let currentMin = this.moment().minute();
         let offset = 10 * Math.round(currentMin / 10);

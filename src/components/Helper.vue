@@ -1,7 +1,7 @@
 <template>
   <div class="helper">
     <transition name="fade-and-scale">
-      <img v-if="show" src="../assets/helper.png" alt="">
+      <img v-if="show" src="../assets/helios_clippy_512x512.png" alt="">
     </transition>
     <transition name="fade-in-delay">
       <div v-if="show" class="popup">
