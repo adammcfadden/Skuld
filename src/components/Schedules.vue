@@ -205,6 +205,7 @@ export default {
     mounted() {
         // Updates every 5 seconds to move time sensitive items
         setInterval(() => {
+
             this.$forceUpdate();
         }, 5000)
 
@@ -216,6 +217,10 @@ export default {
         setTimeout(() => {
             console.log('checking')
             setInterval(() => {
+                // Lets update the dates every 10 min so that is handles moving between days.
+                this.dayStart = new Date().setHours(8, 0, 0, 0);
+                this.dayEnd = new Date().setHours(18, 0, 0, 0);
+
                 this.checkForEventsStarting();
             }, 600000);
         }, roundedMoment.diff(moment().subtract(1, 'minute')))
