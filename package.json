@@ -16,6 +16,7 @@
     "save": "^2.3.1",
     "vue": "^2.3.3",
     "vue-async-computed": "^3.3.1",
+    "vue-router": "^3.0.1",
     "vuetify": "^0.15.7"
   },
   "devDependencies": {

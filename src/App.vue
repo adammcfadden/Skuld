@@ -1,7 +1,25 @@
 <template>
   <v-app dark v-if="ready">
     <v-navigation-drawer persistent :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher>
-      <v-list v-if="rooms">
+
+      <v-list subheader>
+        <v-subheader>Tools</v-subheader>
+
+        <v-list-tile @click="scheduleCheckOpen = !scheduleCheckOpen">
+          <v-list-tile-action>
+            <v-icon>event</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Schedule Check</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+      
+      <v-divider></v-divider>
+
+      <v-list v-if="rooms" subheader>
+        <v-subheader>Room Selection</v-subheader>
+        
         <v-list-tile @click="toggleRoomSelected(room)" :style="{backgroundColor: room.backgroundColor, color: invertColor(room.backgroundColor)}" value="true" v-for="(room, i) in rooms" :key="i">
           <v-list-tile-action>
             <span>{{room.summary.substr(0,1)}}</span>
@@ -29,8 +47,11 @@
       <v-btn ref="authorizeButton" @click="handleAuthClick" id="authorize-button" dark v-else>Authorize</v-btn>
     </v-toolbar>
     <main>
-      <v-slide-y-transition mode="out-in">
+      <v-slide-y-transition mode="out-in" v-if="!scheduleCheckOpen">
         <schedules :schedules="schedules" :currentUnixTime="currentUnixTime"></schedules>
+      </v-slide-y-transition>
+      <v-slide-y-transition mode="out-in" v-if="scheduleCheckOpen">
+        
       </v-slide-y-transition>
     </main>
   </v-app>
@@ -73,6 +94,7 @@ export default {
       gapiClient: undefined,
       currentUnixTime: new Date().getTime(),
       loadFromCache: true,
+      scheduleCheckOpen: false,
     };
   },
   asyncComputed: {
@@ -240,6 +262,9 @@ export default {
       this.schedules = [];
       this.$forceUpdate();
     },
+    toggleScheduleCheck() {
+      this.scheduleCheckOpen = true;
+    }
   },
   mounted() {
     this.handleClientLoad();
