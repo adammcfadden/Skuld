@@ -3,7 +3,6 @@
 import Vue from "vue";
 import Vuetify from "vuetify";
 import AsyncComputed from "vue-async-computed";
-import "./gapi.js";
 import App from "./App";
 
 Vue.use(Vuetify);
