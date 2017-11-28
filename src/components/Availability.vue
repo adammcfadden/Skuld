@@ -171,7 +171,7 @@ export default {
       const groupByDate = (startTimes, endTimes) => {
         let currentDate = this.startDate;
 
-        const days = moment.duration(moment(this.end).diff(moment(this.start))).days()
+        const days = moment(this.end).diff(moment(this.start), 'days')
         const groupedEvents = [];
 
         for(let i=-1; i < days; i++) {
@@ -283,7 +283,7 @@ export default {
       get() {
         return window.gapi.client.calendar.events.list({
           'calendarId': 'primary',
-          'maxResults': 100,
+          'maxResults': 2500,
           'timeMin': this.start,
           'timeMax': this.end,
           'showDeleted': false,
