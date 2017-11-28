@@ -125,7 +125,9 @@ export default {
                 let start = moment(event.start.dateTime);
                 let end = moment(event.end.dateTime);
 
-                if (start.isBetween(otherStart, otherEnd, null, '[)') || end.isBetween(otherStart, otherEnd, null, '(]')) {
+                // If the given event starts or ends between the other events start/end "inclusive" OR
+                // If another event starts or ends between the given events start/end "exclusive"
+                if ((start.isBetween(otherStart, otherEnd, null, '[)') || end.isBetween(otherStart, otherEnd, null, '(]')) || (otherStart.isBetween(start, end, null, '()') || otherStart.isBetween(start, end, null, '()'))) {
                     count += 1;
                 }
             })
@@ -135,17 +137,16 @@ export default {
             return `${100 / this.eventsDuringGivenEvent(event, events)}%`;
         },
         eventLeft(event, events) {
-            let concurrent = this.eventsDuringGivenEvent(event, events);
-
             const group = [];
 
-            events.forEach((otherEvent, otherEventIndex) => {
+            // TODO - remove duplicated code here
+            events.forEach(otherEvent => {
                 let otherStart = moment(otherEvent.start.dateTime);
                 let otherEnd = moment(otherEvent.end.dateTime);
                 let start = moment(event.start.dateTime);
                 let end = moment(event.end.dateTime);
 
-                if (start.isBetween(otherStart, otherEnd, null, '[)') || end.isBetween(otherStart, otherEnd, null, '(]')) {
+                if ((start.isBetween(otherStart, otherEnd, null, '[)') || end.isBetween(otherStart, otherEnd, null, '(]')) || (otherStart.isBetween(start, end, null, '()') || otherStart.isBetween(start, end, null, '()'))) {
                     group.push(otherEvent);
                 }
             })

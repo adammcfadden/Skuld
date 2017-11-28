@@ -3,9 +3,28 @@
     <v-navigation-drawer persistent :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher>
 
       <v-list subheader>
-        <v-subheader>Tools</v-subheader>
 
-        <v-list-tile @click="scheduleCheckOpen = !scheduleCheckOpen">
+        <v-list-tile :class="{'grey': !scheduleCheckOpen}" @click="scheduleCheckOpen = false">
+          <v-list-tile-action>
+            <v-icon>home</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Room Check</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+
+        <v-list transition="slide-y-transition" v-if="rooms && !scheduleCheckOpen" subheader>
+          <v-list-tile @click="toggleRoomSelected(room)" :style="{backgroundColor: room.backgroundColor, color: invertColor(room.backgroundColor)}" value="true" v-for="(room, i) in rooms" :key="i">
+            <v-list-tile-action>
+              <span>{{room.summary.substr(0,1)}}</span>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title v-text="room.summary"></v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+
+        <v-list-tile :class="{'grey': scheduleCheckOpen}" @click="scheduleCheckOpen = true">
           <v-list-tile-action>
             <v-icon>event</v-icon>
           </v-list-tile-action>
@@ -14,21 +33,7 @@
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
-      
-      <v-divider></v-divider>
 
-      <v-list v-if="rooms" subheader>
-        <v-subheader>Room Selection</v-subheader>
-        
-        <v-list-tile @click="toggleRoomSelected(room)" :style="{backgroundColor: room.backgroundColor, color: invertColor(room.backgroundColor)}" value="true" v-for="(room, i) in rooms" :key="i">
-          <v-list-tile-action>
-            <span>{{room.summary.substr(0,1)}}</span>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title v-text="room.summary"></v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
     </v-navigation-drawer>
     <v-toolbar fixed>
       <v-toolbar-side-icon @click.stop="drawer = !drawer" dark></v-toolbar-side-icon>
@@ -51,7 +56,7 @@
         <schedules :schedules="schedules" :currentUnixTime="currentUnixTime"></schedules>
       </v-slide-y-transition>
       <v-slide-y-transition mode="out-in" v-if="scheduleCheckOpen">
-        
+        <availability></availability>
       </v-slide-y-transition>
     </main>
   </v-app>
@@ -61,6 +66,7 @@
 import moment from 'moment';
 
 import Schedules from './components/Schedules';
+import Availability from './components/Availability';
 import Clock from './components/Clock';
 import invertColor from './colorInvert';
 import './main.css';
@@ -126,6 +132,7 @@ export default {
   components: {
     Schedules,
     Clock,
+    Availability,
   },
   methods: {
     loadSelectedRooms() {
