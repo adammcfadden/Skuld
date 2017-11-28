@@ -11,6 +11,7 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
+    "clipboard": "^1.7.1",
     "express": "^4.15.4",
     "moment": "^2.18.1",
     "save": "^2.3.1",
