@@ -324,7 +324,7 @@ export default {
 }
 .form-card {
   width: 85%;
-  background: #222324;
+  background: #424242;
   box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px rgba(0,0,0,0.14), 0 1px 10px rgba(0,0,0,0.12);
   margin-top: 2em;
   padding: 1em 15%;
@@ -348,7 +348,7 @@ export default {
 .copy-icon {
   position: absolute;
   top: 1em;
-  right: 15%;
+  right: 1em;
 }
 .input-size {
   width: 290px;
