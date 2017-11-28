@@ -194,8 +194,6 @@ export default {
                 setTimeout(() => {
                     this.showHelper = false;
                 }, upcomingEvents.length * 15000)
-
-                console.log(upcomingEvents)
             }
         },
         setHelperEvent(room, event) {
@@ -216,7 +214,6 @@ export default {
         let offset = 10 * Math.round(currentMin / 10);
         let roundedMoment = this.moment().add(offset - currentMin, 'minutes');
         setTimeout(() => {
-            console.log('checking')
             setInterval(() => {
                 // Lets update the dates every 10 min so that is handles moving between days.
                 this.dayStart = new Date().setHours(8, 0, 0, 0);

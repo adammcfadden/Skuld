@@ -183,7 +183,6 @@ export default {
           };
 
           if(moment(`${currentDate} ${this.startTime}`, 'YYYY-MM-DD h:mma').isBefore(moment())) {
-            console.log('laksjdkljasd')
             let time = moment();
             let diff = time.minutes() / 15;
             if ( diff < 1 ) {
