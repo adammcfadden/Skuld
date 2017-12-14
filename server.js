@@ -3,6 +3,13 @@ var path = require("path");
 var serveStatic = require("serve-static");
 
 var app = express();
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] !== 'https') {
+    res.redirect(`https://${req.header('host')}${req.url}`)
+  } else {
+    next()
+  }
+})
 app.use(serveStatic(path.join(__dirname, "dist")));
 
 var port = process.env.PORT || 5000;
