@@ -92,7 +92,7 @@ export default {
       drawer: true,
       fixed: false,
       miniVariant: false,
-      date: moment().format("MMMM Do YYYY"),
+      updateDate: 1,
       title: '',
       selectedRooms: this.loadSelectedRooms(),
       schedules: [],
@@ -102,6 +102,12 @@ export default {
       loadFromCache: true,
       scheduleCheckOpen: false,
     };
+  },
+  computed: {
+    date() {
+      if (!this.updateDate) { return }
+      return moment().format("MMMM Do YYYY")
+    }
   },
   asyncComputed: {
     rooms: {
@@ -206,6 +212,7 @@ export default {
 
         // Update rooms once a minute
         this.roomUpdateInterval = setInterval(() => {
+          this.updateDate += 1
           this.updateRoomSchedules();
         }, UPDATE_INTERVAL)
       }
@@ -282,6 +289,7 @@ export default {
       this.updateRoomSchedules()
 
       this.roomUpdateInterval = setInterval(() => {
+        this.updateDate += 1
         this.updateRoomSchedules();
       }, UPDATE_INTERVAL)
 
